@@ -20,6 +20,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         AuditableEntitySaveChangesInterceptor auditableEntitySaveChangesInterceptor)
         : base(options)
     {
+        
         _mediator = mediator;
         _auditableEntitySaveChangesInterceptor = auditableEntitySaveChangesInterceptor;
     }
@@ -27,7 +28,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
+        
+        builder.Entity<Url>().HasIndex(u => u.ShortUrl).IsUnique();
         base.OnModelCreating(builder);
     }
 

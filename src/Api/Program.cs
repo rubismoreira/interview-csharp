@@ -1,5 +1,6 @@
 using FastEndpoints.Swagger;
 using UrlShortenerService.Api.Middlewares;
+using UrlShortenerService.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ _ = builder.Services.AddApplicationServices();
 _ = builder.Services.AddInfrastructureServices(builder.Configuration);
 _ = builder.Services.AddApiServices(builder.Configuration);
 
+
 builder.Services.AddSwaggerDoc(maxEndpointVersion: 1, tagIndex: 0, settings: x =>
 {
     x.DocumentName = "Release 1.0";
@@ -26,6 +28,9 @@ var app = builder.Build();
 
 _ = app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+
+_ = app.UseAuthentication();
+_ = app.UseAuthorization();
 _ = app.UseFastEndpoints();
 
 // Configure the HTTP request pipeline.

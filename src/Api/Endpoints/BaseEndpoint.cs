@@ -1,7 +1,7 @@
 using MediatR;
 using IMapper = AutoMapper.IMapper;
 
-namespace UrlShortenerService.Api.Endpoints;
+namespace Api.Endpoints;
 
 /// <summary>
 /// Base endpoint class with request and response types.
@@ -18,16 +18,20 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
     /// Automapper instance.
     /// </summary>
     protected IMapper Mapper { get; init; }
+    
+    protected IHttpContextAccessor HttpContextAccessor { get; init; }
 
     /// <summary>
     /// Default constructor.
     /// </summary>
     /// <param name="mediator">Injected mediator instance.</param>
     /// <param name="mapper">Injected automapper instance.</param>
-    protected BaseEndpoint(ISender mediator, IMapper mapper)
+    /// <param name="httpContextAccessor">Injected httpContextAccessor instance.</param>
+    protected BaseEndpoint(ISender mediator, IMapper mapper, IHttpContextAccessor httpContextAccessor)
     {
         Mediator = mediator;
         Mapper = mapper;
+        HttpContextAccessor = httpContextAccessor;
     }
 
     /// <summary>
