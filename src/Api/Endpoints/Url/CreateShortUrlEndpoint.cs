@@ -1,12 +1,10 @@
-using System.Security.Claims;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection.Auth;
 using UrlShortenerService.Api.Endpoints.Url.Requests;
 using UrlShortenerService.Application.Url.Commands;
 using IMapper = AutoMapper.IMapper;
 
-namespace Api.Endpoints.Url;
- 
+namespace UrlShortenerService.Api.Endpoints.Url;
+
 public class CreateShortUrlSummary : Summary<CreateShortUrlEndpoint>
 {
     public CreateShortUrlSummary()
@@ -27,8 +25,7 @@ public class CreateShortUrlEndpoint : BaseEndpoint<CreateShortUrlRequest>
     {
         base.Configure();
         Post("u");
-        Policies(AuthData.WriterPolicy);
-        // AllowAnonymous();
+        AllowAnonymous();
         Description(
             d => d.WithTags("Url")
         );
@@ -37,23 +34,13 @@ public class CreateShortUrlEndpoint : BaseEndpoint<CreateShortUrlRequest>
 
     public override async Task HandleAsync(CreateShortUrlRequest req, CancellationToken ct)
     {
-        
-        var userId = HttpContext.User?.FindFirstValue(ClaimTypes.Name) ?? "Anonymous";
         var result = await Mediator.Send(
             new CreateShortUrlCommand
             {
-                Url = req.Url,
-                UserId = userId
+                Url = req.Url
             },
             ct
         );
-        
-        if (result.IsT1)
-        {
-            await SendAsync(result.AsT1, StatusCodes.Status400BadRequest);
-            return;
-        }
-        
         await SendOkAsync(result);
     }
 }

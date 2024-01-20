@@ -1,14 +1,11 @@
 using FluentValidation;
 using HashidsNet;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using UrlShortenerService.Application.Common.Interfaces;
-using OneOf;
-using OneOf.Types;
 
 namespace UrlShortenerService.Application.Url.Commands;
 
-public record RedirectToUrlCommand : IRequest<OneOf<string, NotFound>>
+public record RedirectToUrlCommand : IRequest<string>
 {
     public string Id { get; init; } = default!;
 }
@@ -23,7 +20,7 @@ public class RedirectToUrlCommandValidator : AbstractValidator<RedirectToUrlComm
     }
 }
 
-public class RedirectToUrlCommandHandler : IRequestHandler<RedirectToUrlCommand, OneOf<string, NotFound>>
+public class RedirectToUrlCommandHandler : IRequestHandler<RedirectToUrlCommand, string>
 {
     private readonly IApplicationDbContext _context;
     private readonly IHashids _hashids;
@@ -34,14 +31,9 @@ public class RedirectToUrlCommandHandler : IRequestHandler<RedirectToUrlCommand,
         _hashids = hashids;
     }
 
-    public async Task<OneOf<string, NotFound>> Handle(RedirectToUrlCommand request, CancellationToken cancellationToken)
+    public async Task<string> Handle(RedirectToUrlCommand request, CancellationToken cancellationToken)
     {
-        var url = await _context.Urls.FirstOrDefaultAsync(x => x.ShortUrl == request.Id, cancellationToken);
-        if (url == null)
-        {
-            return new NotFound();
-        }
-
-        return url.OriginalUrl;
+        await Task.CompletedTask;
+        throw new NotImplementedException();
     }
 }

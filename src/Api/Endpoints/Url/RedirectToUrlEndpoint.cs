@@ -3,7 +3,7 @@ using UrlShortenerService.Api.Endpoints.Url.Requests;
 using UrlShortenerService.Application.Url.Commands;
 using IMapper = AutoMapper.IMapper;
 
-namespace Api.Endpoints.Url;
+namespace UrlShortenerService.Api.Endpoints.Url;
 
 public class RedirectToUrlSummary : Summary<RedirectToUrlEndpoint>
 {
@@ -42,13 +42,6 @@ public class RedirectToUrlEndpoint : BaseEndpoint<RedirectToUrlRequest>
             },
             ct
         );
-
-        if (result.IsT1)
-        {
-            await SendNotFoundAsync();
-            return;
-        }
-        
-        await SendRedirectAsync(result.AsT0);
+        await SendRedirectAsync(result);
     }
 }

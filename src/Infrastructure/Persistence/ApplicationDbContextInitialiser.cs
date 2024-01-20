@@ -8,8 +8,7 @@ public class ApplicationDbContextInitialiser
     private readonly ILogger<ApplicationDbContextInitialiser> _logger;
     private readonly ApplicationDbContext _context;
 
-    public ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitialiser> logger,
-        ApplicationDbContext context)
+    public ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitialiser> logger, ApplicationDbContext context)
     {
         _logger = logger;
         _context = context;
@@ -46,14 +45,8 @@ public class ApplicationDbContextInitialiser
 
     public async Task TrySeedAsync()
     {
-        _context.Database.EnsureCreated();
-        if (!await _context.Urls.AnyAsync())
-        {
-            await _context.Urls.AddAsync(new Domain.Entities.Url
-            {
-                OriginalUrl = "https://www.google.com"
-            });
-            await _context.SaveChangesAsync();
-        }
+        // Default data
+        // Seed, if necessary
+        await Task.CompletedTask;
     }
 }

@@ -6,12 +6,10 @@
         <AssemblyName>UrlShortenerService.Infrastructure</AssemblyName>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-      <UserSecretsId>444a55ad-3522-4f22-ada6-b0e300cc01ca</UserSecretsId>
-  </PropertyGroup>
+    </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.0-rc.2.22476.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.0-rc.2.22472.11" />
 	    	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.0" />
     </ItemGroup>

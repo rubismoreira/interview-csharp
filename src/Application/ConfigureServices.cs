@@ -1,10 +1,9 @@
 ﻿using System.Reflection;
+using UrlShortenerService.Application.Common.Behaviours;
 using FluentValidation;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-using UrlShortenerService.Application.Common.Behaviours;
 
-namespace UrlShortenerService.Application;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ConfigureServices
 {
