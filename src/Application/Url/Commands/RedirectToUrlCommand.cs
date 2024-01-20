@@ -18,8 +18,8 @@ public class RedirectToUrlCommandValidator : AbstractValidator<RedirectToUrlComm
     public RedirectToUrlCommandValidator()
     {
         _ = RuleFor(v => v.Id)
-          .NotEmpty()
-          .WithMessage("Id is required.");
+            .NotEmpty()
+            .WithMessage("Id is required.");
     }
 }
 

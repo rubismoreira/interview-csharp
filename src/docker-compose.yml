@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+
+  sqlserver:
+    container_name: sqlserver
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      SA_PASSWORD: Anyp4ss!
+      ACCEPT_EULA: Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+volumes:
+  sqlserver_data:
+    driver: local
+
+    
+  # shortner:
+  #   container_name: shortner
+  #   build:
+  #     context: .
+  #     dockerfile: src/Api/Dockerfile    
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #   ports:
+  #     - "5246:80"
