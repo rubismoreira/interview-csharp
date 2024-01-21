@@ -1,10 +1,9 @@
 using FluentValidation;
 using HashidsNet;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using UrlShortenerService.Application.Common.Interfaces;
 using OneOf;
 using OneOf.Types;
+using UrlShortenerService.Application.Common.Repositories;
 
 namespace UrlShortenerService.Application.Url.Commands;
 
@@ -25,23 +24,21 @@ public class RedirectToUrlCommandValidator : AbstractValidator<RedirectToUrlComm
 
 public class RedirectToUrlCommandHandler : IRequestHandler<RedirectToUrlCommand, OneOf<string, NotFound>>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IHashids _hashids;
+    private readonly IUrlRepository _urlRepository;
 
-    public RedirectToUrlCommandHandler(IApplicationDbContext context, IHashids hashids)
+    public RedirectToUrlCommandHandler(IUrlRepository urlRepository)
     {
-        _context = context;
-        _hashids = hashids;
+        _urlRepository = urlRepository;
     }
 
     public async Task<OneOf<string, NotFound>> Handle(RedirectToUrlCommand request, CancellationToken cancellationToken)
     {
-        var url = await _context.Urls.FirstOrDefaultAsync(x => x.ShortUrl == request.Id, cancellationToken);
-        if (url == null)
+        var url = await _urlRepository.GetUrlByShortUrlAsync(request.Id);
+        if (url.IsT1)
         {
-            return new NotFound();
+            return url.AsT1;
         }
 
-        return url.OriginalUrl;
+        return url.AsT0.OriginalUrl;
     }
 }

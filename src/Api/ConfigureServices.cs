@@ -3,6 +3,7 @@ using HashidsNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection.Auth;
+using OpenTelemetry.Metrics;
 using UrlShortenerService.Api.Middlewares;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,13 @@ public static class ConfigureServices
                 p.RequireClaim(ClaimTypes.Name);
             });
         });
+
+        _ = services.AddOpenTelemetry()
+            .WithMetrics(x =>
+            {
+                x.AddPrometheusExporter();
+                x.AddMeter("Microsoft.AspNetCore.Http", "Requests", "Requests per second", "requests/second");
+            });
         
         _ = services.AddFastEndpoints();
 

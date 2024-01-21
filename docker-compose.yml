@@ -11,6 +11,12 @@ services:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
 volumes:
   sqlserver_data:
     driver: local

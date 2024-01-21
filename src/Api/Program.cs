@@ -40,6 +40,8 @@ if (app.Environment.IsDevelopment())
     _ = app.UseSwaggerUi3();
 }
 
+_ = app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
 _ = app.UseHttpsRedirection();
 
 app.Run();
