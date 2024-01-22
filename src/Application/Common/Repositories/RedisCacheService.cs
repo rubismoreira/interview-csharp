@@ -6,10 +6,12 @@ namespace UrlShortenerService.Application.Common.Repositories;
 public class RedisCacheService : IRedisCacheService
 {
     private readonly IDistributedCache _distributedCache;
+    private readonly CacheMetrics _cacheMetrics;
     
-    public RedisCacheService(IDistributedCache distributedCache)
+    public RedisCacheService(IDistributedCache distributedCache, CacheMetrics cacheMetrics)
     {
         _distributedCache = distributedCache;
+        _cacheMetrics = cacheMetrics;
     }
     
     public async Task SetAsync<T>(string key, T value, TimeSpan expiry)
@@ -26,7 +28,12 @@ public class RedisCacheService : IRedisCacheService
     {
         var jsonData = await _distributedCache.GetStringAsync(key);
         if (jsonData == null)
+        {
+            _cacheMetrics.Miss();
             return default(T);
+        }
+        
+        _cacheMetrics.Hit();
         return JsonSerializer.Deserialize<T>(jsonData);
     }
 }

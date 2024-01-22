@@ -17,5 +17,4 @@ public class Url : BaseAuditableEntity
     /// </summary>
     public string OriginalUrl { get; set; } = default!;
     
-    public string ShortUrl { get; set; } = default!;
 }

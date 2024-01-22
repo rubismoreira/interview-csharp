@@ -17,6 +17,9 @@ public static class ConfigureServices
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
+        
+       services.AddScoped<CacheMetrics>();
+       services.AddTransient<DatabaseQueryMetrics>();
 
         services.AddScoped<IRedisCacheService, RedisCacheService>();
         services.AddScoped<IUrlRepository, UrlRepository>();

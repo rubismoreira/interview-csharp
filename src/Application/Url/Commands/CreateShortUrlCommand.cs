@@ -50,30 +50,39 @@ public class CreateShortUrlCommandHandler : IRequestHandler<CreateShortUrlComman
 
     public static string UrlToHex(string input)
     {
+        var test = input.GetHashCode();
         var bytes = Encoding.UTF8.GetBytes(input);
         return BitConverter.ToString(bytes).Replace("-", "").ToLower();
     }
 
+    public static long GetLongFromGuid(Guid guid)
+    {
+        // Convert the GUID to a byte array
+        byte[] byteArray = guid.ToByteArray();
+
+        // Convert the first 8 bytes of the array to a long
+        long longValue = BitConverter.ToInt64(byteArray, 0);
+
+        return longValue;
+    }
+
     public async Task<OneOf<string, Error<string>>> Handle(CreateShortUrlCommand request, CancellationToken cancellationToken)
     {
-        var hexed = UrlToHex(request.Url);
-        var encoded = _hashids.EncodeHex(hexed);
-
         try
         {
-            var temp = await _context.Urls.AddAsync(new UrlShortenerService.Domain.Entities.Url
+            var generatedUrl = await _context.Urls.AddAsync(new UrlShortenerService.Domain.Entities.Url
             {
                 OriginalUrl = request.Url,
-                ShortUrl = encoded,
                 CreatedBy = request.UserId
             }, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
+
+            return _hashids.EncodeLong(generatedUrl.Entity.Id);
         }
         catch (DbUpdateException e)
         {
-            return new Error<string>(e.InnerException.Message);
+            return new Error<string>(e.InnerException?.Message);
         }
-        return encoded;
     }
 }

@@ -1,6 +1,10 @@
 version: '3.8'
-services:
 
+configs:
+  prometheus_config:
+    file: ./prometheus.yml
+
+services:
   sqlserver:
     container_name: sqlserver
     image: mcr.microsoft.com/mssql/server
@@ -11,17 +15,9 @@ services:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
+    networks: 
+      - enpal_net
 
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
-
-volumes:
-  sqlserver_data:
-    driver: local
-
-    
   # shortner:
   #   container_name: shortner
   #   build:
@@ -31,3 +27,46 @@ volumes:
   #     - ASPNETCORE_ENVIRONMENT=Development
   #   ports:
   #     - "5246:80"
+  #   networks: 
+  #     - enpal_net
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks: 
+      - enpal_net
+  
+  prometheus:
+    image: quay.io/prometheus/prometheus:latest
+    ports:
+      - "9090:9090"
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    networks:
+      - enpal_net
+
+  grafana:
+    image : grafana/grafana
+    depends_on: 
+      - prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/data/:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ./config.monitoring
+    networks:
+      - enpal_net
+
+volumes:
+  sqlserver_data:
+    driver: local
+
+networks:
+  enpal_net:
+    driver: bridge
+
+    

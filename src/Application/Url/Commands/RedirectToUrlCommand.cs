@@ -25,15 +25,18 @@ public class RedirectToUrlCommandValidator : AbstractValidator<RedirectToUrlComm
 public class RedirectToUrlCommandHandler : IRequestHandler<RedirectToUrlCommand, OneOf<string, NotFound>>
 {
     private readonly IUrlRepository _urlRepository;
+    private readonly IHashids _iHashids;
 
-    public RedirectToUrlCommandHandler(IUrlRepository urlRepository)
+    public RedirectToUrlCommandHandler(IUrlRepository urlRepository, IHashids iHashids)
     {
         _urlRepository = urlRepository;
+        _iHashids = iHashids;
     }
 
     public async Task<OneOf<string, NotFound>> Handle(RedirectToUrlCommand request, CancellationToken cancellationToken)
     {
-        var url = await _urlRepository.GetUrlByShortUrlAsync(request.Id);
+        var decodedId = _iHashids.DecodeSingleLong(request.Id);
+        var url = await _urlRepository.GetUrlByShortUrlAsync(decodedId);
         if (url.IsT1)
         {
             return url.AsT1;

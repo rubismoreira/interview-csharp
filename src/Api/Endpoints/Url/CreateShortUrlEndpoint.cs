@@ -37,14 +37,13 @@ public class CreateShortUrlEndpoint : BaseEndpoint<CreateShortUrlRequest>
 
     public override async Task HandleAsync(CreateShortUrlRequest req, CancellationToken ct)
     {
-        
         var userId = HttpContext.User?.FindFirstValue(ClaimTypes.Name) ?? "Anonymous";
+        
+        var command = Mapper.Map<CreateShortUrlCommand>(req, 
+            opts => opts.Items["UserId"] = userId);
+            
         var result = await Mediator.Send(
-            new CreateShortUrlCommand
-            {
-                Url = req.Url,
-                UserId = userId
-            },
+            command,
             ct
         );
         
@@ -54,6 +53,6 @@ public class CreateShortUrlEndpoint : BaseEndpoint<CreateShortUrlRequest>
             return;
         }
         
-        await SendOkAsync(result);
+        await SendOkAsync(result.AsT0);
     }
 }

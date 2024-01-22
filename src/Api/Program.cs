@@ -1,3 +1,4 @@
+using Api;
 using FastEndpoints.Swagger;
 using UrlShortenerService.Api.Middlewares;
 using UrlShortenerService.Application;
