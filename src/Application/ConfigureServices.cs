@@ -22,7 +22,9 @@ public static class ConfigureServices
        services.AddTransient<DatabaseQueryMetrics>();
 
         services.AddScoped<IRedisCacheService, RedisCacheService>();
+        
         services.AddScoped<IUrlRepository, UrlRepository>();
+        services.AddScoped<IUrlWriteRepository, UrlWriteRepository>();
 
         return services;
     }

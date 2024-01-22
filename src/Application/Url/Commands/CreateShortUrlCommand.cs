@@ -1,11 +1,9 @@
-using System.Text;
 using FluentValidation;
 using HashidsNet;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using UrlShortenerService.Application.Common.Interfaces;
 using OneOf;
 using OneOf.Types;
+using UrlShortenerService.Application.Common.Repositories;
 
 namespace UrlShortenerService.Application.Url.Commands;
 
@@ -20,10 +18,10 @@ public class CreateShortUrlCommandValidator : AbstractValidator<CreateShortUrlCo
     public CreateShortUrlCommandValidator()
     {
         _ = RuleFor(v => v.Url)
-          .NotEmpty()
-          .WithMessage("Url is required.")
-          .Must(ValidUrl)
-          .WithMessage("Url is not valid.");
+            .NotEmpty()
+            .WithMessage("Url is required.")
+            .Must(ValidUrl)
+            .WithMessage("Url is not valid.");
     }
 
     private bool ValidUrl(string input)
@@ -32,57 +30,32 @@ public class CreateShortUrlCommandValidator : AbstractValidator<CreateShortUrlCo
         {
             input = "http://" + input;
         }
-        
+
         return Uri.IsWellFormedUriString(input, UriKind.Absolute);
     }
 }
 
 public class CreateShortUrlCommandHandler : IRequestHandler<CreateShortUrlCommand, OneOf<string, Error<string>>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUrlWriteRepository _repository;
     private readonly IHashids _hashids;
 
-    public CreateShortUrlCommandHandler(IApplicationDbContext context, IHashids hashids)
+    public CreateShortUrlCommandHandler(IHashids hashids, IUrlWriteRepository repository)
     {
-        _context = context;
         _hashids = hashids;
+        _repository = repository;
     }
 
-    public static string UrlToHex(string input)
+    public async Task<OneOf<string, Error<string>>> Handle(CreateShortUrlCommand request,
+        CancellationToken cancellationToken)
     {
-        var test = input.GetHashCode();
-        var bytes = Encoding.UTF8.GetBytes(input);
-        return BitConverter.ToString(bytes).Replace("-", "").ToLower();
-    }
+        var generatedUrl = await _repository.AddUrlAsync(
+            new UrlShortenerService.Domain.Entities.Url { OriginalUrl = request.Url, CreatedBy = request.UserId },
+            cancellationToken);
 
-    public static long GetLongFromGuid(Guid guid)
-    {
-        // Convert the GUID to a byte array
-        byte[] byteArray = guid.ToByteArray();
+        if (generatedUrl.IsT1)
+            return generatedUrl.AsT1;
 
-        // Convert the first 8 bytes of the array to a long
-        long longValue = BitConverter.ToInt64(byteArray, 0);
-
-        return longValue;
-    }
-
-    public async Task<OneOf<string, Error<string>>> Handle(CreateShortUrlCommand request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var generatedUrl = await _context.Urls.AddAsync(new UrlShortenerService.Domain.Entities.Url
-            {
-                OriginalUrl = request.Url,
-                CreatedBy = request.UserId
-            }, cancellationToken);
-
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return _hashids.EncodeLong(generatedUrl.Entity.Id);
-        }
-        catch (DbUpdateException e)
-        {
-            return new Error<string>(e.InnerException?.Message);
-        }
+        return _hashids.EncodeLong(generatedUrl.AsT0.Id);
     }
 }
