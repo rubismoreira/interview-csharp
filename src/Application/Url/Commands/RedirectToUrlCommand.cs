@@ -35,7 +35,17 @@ public class RedirectToUrlCommandHandler : IRequestHandler<RedirectToUrlCommand,
 
     public async Task<OneOf<string, NotFound>> Handle(RedirectToUrlCommand request, CancellationToken cancellationToken)
     {
-        var decodedId = _iHashids.DecodeSingleLong(request.Id);
+        long decodedId;
+        try
+        {
+            decodedId = _iHashids.DecodeSingleLong(request.Id);
+
+        }
+        catch (Exception e)
+        {
+            return new NotFound();
+        }
+
         var url = await _urlRepository.GetUrlByShortUrlAsync(decodedId);
         if (url.IsT1)
         {

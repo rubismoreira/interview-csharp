@@ -24,3 +24,44 @@ Getting Started
     Run the application with your IDE of choice or by running dotnet run --project ./src/Api/Api.csproj in the project root directory in a terminal.
     Implement the required endpoints. Basic scaffolding for them already exists in the <project_root>/src/Api/Endpoints/Url directory.
     Test your implementation using a web browser or a tool like curl
+
+## Dev
+
+### 1. Endpoints
+#### 1.1 -> CreateShortUrl
+AA. CC.
+1. Creates a entry on the db and hash the newly created Id returning it to the consumer
+2. Same website www.x.com -> will be stored x times with different ids
+3. Requires AuthData.WriterPolicy for authorization
+4. Validates:
+    - payload exists
+    - payload is url
+
+
+#### 1.2 -> RedirectToUrlCommand
+1. Requires no authorization
+2. If no result is found will return not found 404
+3. If id exists the redirection is immediate
+
+
+### 2. Authorization and Authentication
+In order to leverage the dotnet user-jwts to create tokens for the app:
+``` 
+dotnet user-jwts create --name WriterYes --claim "writer=true"
+``````
+This tool will create a token for user named WriterYes having a custom claim: writer = true
+
+### 3. DB and Caching
+A cache is in place with redis to alleviate get stress on the db
+The cache invalidation is done just trough TTL of the item on 5 minutes
+
+### 4. Metrics
+Metrics are collected by prometheus on a scrape interval of 10s. 
+For the sake of this project just a histogram was created for collecting data times used
+
+### 5. Database migrations
+```
+    dotnet ef migrations add MigrationName
+    dotnet ef database update
+```
+
